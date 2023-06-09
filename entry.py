@@ -12,6 +12,7 @@ import customtkinter
 import setParameter as sp
 import measure as ms
 import waveform_plot as wp
+from tkinter import Scale
 
 
 # =========================================================
@@ -31,7 +32,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("Oscilloscope Automation")
-        self.geometry("800x600")
+        self.geometry("1000x1000")
         self.grid_columnconfigure(0, weight=1)
 
         self.button = customtkinter.CTkButton(
@@ -165,6 +166,56 @@ class App(customtkinter.CTk):
         self.button8.grid(row=9, column=1, padx=10, pady=20,
                           sticky="ew", columnspan=1)
 
+
+        # scaling and offset
+    
+        self.label = customtkinter.CTkLabel(
+            self, text="Vertical Scaling (unit: mV | from 100 to 1300)", fg_color="transparent", width=1)
+        self.label.grid(row=10, column=0, padx=0, columnspan=1, sticky="ew")
+        self.slider1 = Scale(self, from_=100, to=1300, orient='horizontal', command=self.general_vertical_scaling)
+        self.slider1.grid(row=10, column=1, padx=10, pady=20,
+                          sticky="ew", columnspan=3)
+        self.slider1.set(200)
+
+        self.label = customtkinter.CTkLabel(
+            self, text="Vertical Offset (unit: mV | from 0 to 1000 )", fg_color="transparent", width=1)
+        self.label.grid(row=11, column=0, padx=0, columnspan=1, sticky="ew")
+        self.slider2 = Scale(self, from_=0, to=1000, orient='horizontal', command=self.general_vertical_offset)
+        self.slider2.grid(row=11, column=1, padx=10, pady=20,
+                          sticky="ew", columnspan=3)
+        self.slider2.set(540)
+        
+        self.label = customtkinter.CTkLabel(
+            self, text="Horizontal Scaling (unit: Microsecond | from 100 to 1500)", fg_color="transparent", width=1)
+        self.label.grid(row=12, column=0, padx=0, columnspan=1, sticky="ew")
+        self.slider3 = Scale(self, from_=100, to=1300, orient='horizontal', command=self.general_horizontal_scaling)
+        self.slider3.grid(row=12, column=1, padx=10, pady=20,
+                          sticky="ew", columnspan=3)
+
+        self.slider3.set(500)
+
+        self.label = customtkinter.CTkLabel(
+            self, text="Horizontal Offset (unit: Microsecond | from -100 to 100)", fg_color="transparent", width=1)
+        self.label.grid(row=13, column=0, padx=0, columnspan=1, sticky="ew")
+        self.slider4 = Scale(self, from_=-1000, to=1000, orient='horizontal', command=self.general_horizontal_offset)
+        self.slider4.grid(row=13, column=1, padx=10, pady=20,
+                          sticky="ew", columnspan=3)
+        
+        self.slider4.set(0)
+
+
+
+        self.selected_slider = self.slider1
+        # self.slider1.bind('<Key>', self.handle_keypress)
+        # self.slider2.bind('<Key>', self.handle_keypress)
+        # self.slider3.bind('<Key>', self.handle_keypress)
+        # self.slider4.bind('<Key>', self.handle_keypress)
+        self.bind('<Key>', self.handle_keypress)
+
+
+
+        # self.slider1.bind('<Key>',lambda event: self.vertical_scaling_increasing())
+
     def auto_scale_callback(self):
         print("button pressed")
         sp.autoScle()
@@ -246,6 +297,66 @@ class App(customtkinter.CTk):
         path = self.screenshot_path.get()
         print(self.screenshot_path.get())
         wp.download_screen_image(path)
+
+    # set the step
+    def handle_keypress(self, event):
+        if event.keysym == 'Left':
+            self.selected_slider.set(self.selected_slider.get() - 10)
+        elif event.keysym == 'Right':
+            self.selected_slider.set(self.selected_slider.get() + 10)
+        elif event.keysym == 'Down':
+            if self.selected_slider == self.slider1:
+                self.selected_slider = self.slider2
+            elif self.selected_slider == self.slider2:
+                self.selected_slider = self.slider3
+            elif self.selected_slider == self.slider3:
+                self.selected_slider = self.slider4
+
+        elif event.keysym == 'Up':
+            if self.selected_slider == self.slider2:
+                
+                self.selected_slider = self.slider1
+            elif self.selected_slider == self.slider3:
+                self.selected_slider = self.slider2
+            elif self.selected_slider == self.slider4:
+                self.selected_slider = self.slider3
+        
+        for slider in [self.slider1, self.slider2, self.slider3, self.slider4]:
+            if slider == self.selected_slider:
+                slider.config(troughcolor='green')
+            else:
+                slider.config(troughcolor='grey')   
+
+
+        if self.selected_slider == self.slider1:
+            self.vertical_scaling()   
+
+
+    def general_vertical_scaling(self, value):
+        # value = self.slider1.get()
+        print(value)
+        sp.vertical_scaling(value)
+
+    def general_vertical_offset(self, value):
+        print(value)
+        sp.vertical_offset(value)
+
+    def general_horizontal_scaling(self, value):
+        print(value)
+        sp.horizontal_scaling(value)
+
+    def general_horizontal_offset(self, value):
+        print(value)
+        sp.horizontal_offset(value)
+
+    
+
+
+    
+    
+ 
+
+        
 
 
 app = App()
