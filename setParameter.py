@@ -192,6 +192,32 @@ def sample_auto_clicked():
     scope.write(":ACQuire:SRATe:ANALog:AUTO ON")
 
 
+# vertical scaling (100 to 1300) mv
+def vertical_scaling(value):
+    global source
+    global scope
+    scope.write(f":{source}:SCALe {value}E-3")
+
+# vertical offset (0 to 1000) mv
+def vertical_offset(value):
+    global source
+    global scope
+    scope.write(f"{source}:OFFSet {value}E-3")
+
+
+def horizontal_scaling(value):
+    global source
+    global scope
+    scope.write(f":TIMebase:SCALe {value}E-06")
+
+
+def horizontal_offset(value):
+    global source
+    global scope
+    scope.write(f":TIMebase:POSition {value}E-6")
+
+
+
 # -------ending-----------------
 
 
